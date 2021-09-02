@@ -24,22 +24,16 @@ uniform mat4 mv_matrix;
 uniform mat4 proj_matrix;
 uniform mat4 norm_matrix;
 
-out vec4 varyingColor;
+out vec3 varyingNormal;
+out vec3 varyingPosition;
+out vec3 varyingLightDir;
 
 void main(){
 
-	vec4 P = mv_matrix * vec4(pos, 1.0f);
-	vec3 N = normalize((norm_matrix*vec4(normal, 1.0)).xyz);
-	vec3 L = normalize(light.position - P.xyz);
+	varyingPosition = (mv_matrix*vec4(pos, 1.0)).xyz;
+	varyingNormal = (norm_matrix*vec4(normal, 1.0f)).xyz;
+	varyingLightDir = (light.position-varyingPosition);
 
-	vec3 V = normalize(-P.xyz);
-	vec3 R = reflect(-L, N);
-
-	vec3 ambient = ((globalAmbient*material.ambient+light.ambient*material.ambient).xyz);
-	vec3 diffuse = (light.diffuse * material.diffuse).xyz*max(0.0, dot(N, L));
-	vec3 specular = (material.specular*light.specular).xyz*pow(max(0.0, dot(R, V)), material.shininess);
-
-	varyingColor = vec4(ambient+diffuse+specular, 1.0);
 	gl_Position = proj_matrix*mv_matrix*vec4(pos, 1.0);
 
 }
